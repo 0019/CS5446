@@ -1,16 +1,19 @@
 from pettingzoo.atari import boxing_v1
 
+env = boxing_v1.parallel_env()
+
 
 def main():
-    env = boxing_v1.env()
-    env.reset()
-    for agent in env.agent_iter():
-        observation, reward, done, info = env.last()
-        if agent == "first_0":
-            env.step(env.action_space(agent).sample())
-        else:
-            env.step(0)
+    observations = env.reset()
+    max_cycles = 500
+    for step in range(max_cycles):
+        actions = {agent: policy(observations[agent], agent) for agent in env.agents}
+        observations, rewards, dones, infos = env.step(actions)
         env.render()
+
+
+def policy(obsv, agent):
+    return env.action_space(agent).sample()
 
 
 if __name__ == '__main__':
